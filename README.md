@@ -1,6 +1,6 @@
 # Tema Azulgrana para Claude Code
 
-Un tema para la app de escritorio y la app del celular de Claude Code, inspirado en los colores de San Lorenzo de Almagro: de fondo, un cielo de noche que va del azul al grana sobre techos de barrio, con estrellas, luna, torres de luz de cancha y cuervos que cruzan lento, y una paleta azul y grana para toda la interfaz en modo claro y oscuro. No usa el escudo ni ninguna marca del club, solo los colores.
+Un tema para la app de escritorio y la app del celular de Claude Code, inspirado en los colores de San Lorenzo de Almagro: de fondo, una cancha de noche con torres de luz, la tribuna azulgrana llena con humo de bengalas, trapos de "Boedo 1908", "El Ciclón" y "Los Cuervos", y cuervos que cruzan el cielo, y una paleta azul y grana para toda la interfaz en modo claro y oscuro. No usa el escudo ni ninguna marca del club, solo los colores.
 
 ## Instalar
 

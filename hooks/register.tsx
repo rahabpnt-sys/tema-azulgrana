@@ -4,7 +4,7 @@ import { THEME } from './theme.js'
 
 const LOOK: ThemeSetArgs = {
   colors: THEME,
-  backdrop: { scene: 'cielo-boedo', glass: { blur: 18, opacity: 0.55 } },
+  backdrop: { scene: 'cancha', glass: { blur: 18, opacity: 0.55 } },
 }
 
 async function apply($: EngineInterface): Promise<string> {
@@ -29,10 +29,10 @@ export const register: Register = on => {
     if (e.surface !== 'desktop' && e.surface !== 'mobile') {
       return next(e)
     }
-    if (e.props.scene !== 'cielo-boedo') {
+    if (e.props.scene !== 'cancha') {
       return next(e)
     }
     const { Svg } = $.ui.resolve(e)
-    return <Svg source={SCENE} alt="Cielo de noche azul con resplandor grana sobre techos de barrio, estrellas, luna y cuervos que cruzan lento" isInteractive />
+    return <Svg source={SCENE} alt="Cancha de noche con torres de luz, tribuna azulgrana llena con humo de bengalas, trapos que dicen Boedo 1908, El Ciclón y Los Cuervos, y cuervos cruzando el cielo" isInteractive />
   })
 }
