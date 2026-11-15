@@ -1,0 +1,5 @@
+{
+  "name": "tema-azulgrana",
+  "owner": { "name": "rahabpnt-sys" },
+  "plugins": [{ "name": "azulgrana", "source": "./" }]
+}
