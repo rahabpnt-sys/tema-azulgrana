@@ -1,38 +1,83 @@
 import type { EngineInterface, Register, ThemeSetArgs } from 'claude-code'
-import { SCENE } from './scene.js'
+import { AURORA } from './scene-aurora.js'
+import { CIELO } from './scene-cielo.js'
 import { THEME } from './theme.js'
 
-const LOOK: ThemeSetArgs = {
-  colors: THEME,
-  backdrop: { scene: 'cancha', glass: { blur: 18, opacity: 0.55 } },
+type Fondo = 'cielo' | 'aurora'
+
+const FONDOS: Record<Fondo, { nombre: string; look: ThemeSetArgs }> = {
+  cielo: {
+    nombre: 'Cielo de Boedo',
+    look: { colors: THEME, backdrop: { scene: 'cielo-boedo', glass: { blur: 14, opacity: 0.55 } } },
+  },
+  aurora: {
+    nombre: 'Aurora azulgrana',
+    look: { colors: THEME, backdrop: { scene: 'aurora', glass: { blur: 10, opacity: 0.5 } } },
+  },
 }
 
-async function apply($: EngineInterface): Promise<string> {
-  const set = await $.theme.set(LOOK)
-  const surfaces = await $.session.surfaces()
-  const drawn = set.isDrawn ? 'se está dibujando' : `no se dibuja (${set.reason})`
+const ESCENAS: Record<string, { source: string; alt: string }> = {
+  'cielo-boedo': {
+    source: CIELO,
+    alt: 'Cielo de noche azul con resplandor grana sobre techos de barrio, estrellas, luna y cuervos que cruzan lento',
+  },
+  aurora: {
+    source: AURORA,
+    alt: 'Manchas de luz azul, violeta y grana que flotan y se mezclan despacio sobre un fondo oscuro',
+  },
+}
 
-  return `${drawn}; pantallas: ${surfaces.join(', ') || 'ninguna'}`
+function esFondo(valor: unknown): valor is Fondo {
+  return valor === 'cielo' || valor === 'aurora'
+}
+
+async function fondoGuardado($: EngineInterface): Promise<Fondo> {
+  const guardado = await $.store.get('fondo')
+  return esFondo(guardado) ? guardado : 'cielo'
+}
+
+async function apply($: EngineInterface, fondo: Fondo): Promise<string> {
+  const set = await $.theme.set(FONDOS[fondo].look)
+  const drawn = set.isDrawn ? 'se está dibujando' : `no se dibuja (${set.reason})`
+  return `${FONDOS[fondo].nombre}, ${drawn}`
 }
 
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
-    await $.command.register({ name: 'azulgrana', description: 'Vuelve a aplicar el tema azulgrana y muestra su estado' })
-    await apply($)
-
+    await $.command.register({
+      name: 'azulgrana',
+      description: 'Cambia el fondo: /azulgrana cielo, /azulgrana aurora, o solo /azulgrana para alternar',
+    })
+    await apply($, await fondoGuardado($))
     return next(e)
   })
 
-  on('command.run', { command: 'azulgrana' }, async $ => ({ text: `Azulgrana: ${await apply($)}` }))
+  on('command.run', { command: 'azulgrana' }, async ($, e) => {
+    const pedido = (e.args ?? '').trim().toLowerCase()
+    const actual = await fondoGuardado($)
+    let fondo: Fondo
+    if (pedido === '') {
+      fondo = actual === 'cielo' ? 'aurora' : 'cielo'
+    } else if (pedido.startsWith('cielo') || pedido.startsWith('boedo')) {
+      fondo = 'cielo'
+    } else if (pedido.startsWith('aurora')) {
+      fondo = 'aurora'
+    } else {
+      return { text: 'Azulgrana: no conozco ese fondo. Probá /azulgrana cielo o /azulgrana aurora.' }
+    }
+    await $.store.set('fondo', fondo)
+    return { text: `Azulgrana: ${await apply($, fondo)}` }
+  })
 
   on('ui.render', { component: 'Backdrop' }, ($, e, next) => {
     if (e.surface !== 'desktop' && e.surface !== 'mobile') {
       return next(e)
     }
-    if (e.props.scene !== 'cancha') {
+    const escena = typeof e.props.scene === 'string' ? ESCENAS[e.props.scene] : undefined
+    if (!escena) {
       return next(e)
     }
     const { Svg } = $.ui.resolve(e)
-    return <Svg source={SCENE} alt="Cancha de noche con torres de luz, tribuna azulgrana llena con humo de bengalas, trapos que dicen Boedo 1908, El Ciclón y Los Cuervos, y cuervos cruzando el cielo" isInteractive />
+    return <Svg source={escena.source} alt={escena.alt} isInteractive />
   })
 }
