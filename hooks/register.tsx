@@ -4,7 +4,7 @@ import { THEME } from './theme.js'
 
 const LOOK: ThemeSetArgs = {
   colors: THEME,
-  backdrop: { scene: 'bastones', glass: { blur: 18, opacity: 0.72 } },
+  backdrop: { scene: 'cielo-boedo', glass: { blur: 18, opacity: 0.55 } },
 }
 
 async function apply($: EngineInterface): Promise<string> {
@@ -29,10 +29,10 @@ export const register: Register = on => {
     if (e.surface !== 'desktop' && e.surface !== 'mobile') {
       return next(e)
     }
-    if (e.props.scene !== 'bastones') {
+    if (e.props.scene !== 'cielo-boedo') {
       return next(e)
     }
     const { Svg } = $.ui.resolve(e)
-    return <Svg source={SCENE} alt="Bastones verticales azul y grana con un brillo que pasa lento" isInteractive />
+    return <Svg source={SCENE} alt="Cielo de noche azul con resplandor grana sobre techos de barrio, estrellas, luna y cuervos que cruzan lento" isInteractive />
   })
 }
